@@ -1,4 +1,4 @@
-##修复新版本Singularity对slurm的支持的问题
+修复新版本Singularity对slurm的支持的问题
 
 ```shell
 $ git clone https://github.com/singularityware/singularity.git下载github上最新的Singularity源码
