@@ -147,3 +147,7 @@ service ip6tables stop
 16644 Jps
 16586 NodeManager
 
+## 19. Check if we get 2 live data-nodes
+hdfs dfsadmin -report
+
+## 20. Check ResourceManager on browser
