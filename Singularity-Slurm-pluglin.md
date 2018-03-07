@@ -1,4 +1,4 @@
-修复新版本Singularity对slurm的支持的问题
+## 修复新版本Singularity对slurm的支持的问题
 
 ```shell
 $ git clone https://github.com/singularityware/singularity.git下载github上最新的Singularity源码
@@ -8,12 +8,12 @@ $ cd singularity
 $ git checkout tags/${version} -b ${version}
 $ ./autogen.sh
 ```
-同时下载Singularity-2.3.1源码包:
+## 同时下载Singularity-2.3.1源码包:
 ```shell
 $ wget https://github.com/singularityware/singularity/releases/download/2.3.1/singularity-2.3.1.tar.gz
 $ tar -xvzf singularity-2.3.1.tar.gz
 ```
-将singularity中的configure文件替换为singularity-2.3.1中的configure文件，其中包含了with-slurm的支持：
+## 将singularity中的configure文件替换为singularity-2.3.1中的configure文件，其中包含了with-slurm的支持：
 ```python
 if test "${with_slurm+set}" = set; then :
   withval=$with_slurm;
