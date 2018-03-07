@@ -136,5 +136,14 @@ service ip6tables stop
 
 ## 17. jps on nn1
 [root@nn1 hadoop-2.7.5] jps
+21776 SecondaryNameNode
+22240 Jps
+21574 NameNode
+21974 ResourceManager
 
 ## 18. jps on dn1 and dn2
+[root@dn1 hadoop-2.7.5] jps
+12752 DataNode
+16644 Jps
+16586 NodeManager
+
