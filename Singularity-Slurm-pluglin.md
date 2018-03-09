@@ -60,6 +60,7 @@ $ ./configure --prefix=/usr/local --with-slurm
 $ make
 $ sudo make install
 ```
+
 编译过程中需要安装一些依赖包：
 ```shell
 $ yum install -y gcc automake autoconf texinfo
