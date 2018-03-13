@@ -74,6 +74,7 @@ Configure and build the runtime:
                --with-libcurl                   \
                --with-munge                     \
                --with-slurm=/path/to/your/slurm/installation
+(if there is no 'LIBCURL = ' setting in file src/Makefile, set the 'LIBCURL = -L/usr/lib64/ -lcurl') !!!
    make -j8
    sudo make install
 
