@@ -30,42 +30,41 @@ Dependencies
 Make sure you have all the required packages installed.
 For RHEL/CentOS/Scientific Linux systems:
 
-.. code-block:: bash
+```bash
 
    yum install epel-release
    yum install gcc glibc-devel munge libcurl-devel json-c \
        json-c-devel pam-devel munge-devel libtool autoconf automake \
        gcc-c++ xfsprogs python-devel libcap-devel
+```
 
 For Debian/Ubuntu systems:
 
-.. code-block:: bash
-
+```bash
    sudo apt-get install unzip libjson-c2 libjson-c-dev libmunge2 libmunge-dev \
                         libcurl4-openssl-dev autoconf automake libtool curl \
                         make xfsprogs python-dev libcap-dev wget
- 
+```
   
 Download, configure, build and install
 ++++++++++++++++++++++++++++++++++++++
 
 Clone the github repository to obtain the source:
 
-.. code-block:: bash
-
+```bash
    git clone https://github.com/NERSC/shifter.git
    cd shifter
-
+```
 The following environment variables indicate the directories where Shifter's configuration files and images are located:
 
-.. code-block:: bash
+```bash
 
    export SHIFTER_SYSCONFDIR=/etc/shifter
    export UDIROOT_PREFIX=/opt/shifter/udiRoot
-
+```
 Configure and build the runtime:
 
-.. code-block:: bash
+```bash
 
    ./autogen.sh
    ./configure --prefix=$UDIROOT_PREFIX         \
@@ -74,22 +73,22 @@ Configure and build the runtime:
                --with-libcurl                   \
                --with-munge                     \
                --with-slurm=/path/to/your/slurm/installation
-               
+```               
 (if there is no 'LIBCURL = ' setting in file src/Makefile, set the 'LIBCURL = -L/usr/lib64/ -lcurl') !!!
-
+```bash
    make -j8
    sudo make install
-
+```
 Create links to system directories and additional required directories:
 
-.. code-block:: bash
+```bash
 
    sudo ln -s $UDIROOT_PREFIX/bin/shifter /usr/bin/shifter
    sudo ln -s $UDIROOT_PREFIX/bin/shifterimg /usr/bin/shifterimg
    sudo mkdir -p /usr/libexec/shifter
    sudo ln -s /opt/shifter/udiRoot/libexec/shifter/mount /usr/libexec/shifter/mount
    sudo mkdir -p $SHIFTER_SYSCONFDIR
-
+````
 
 Shifter's runtime configuration parameters
 ++++++++++++++++++++++++++++++++++++++++++
@@ -112,12 +111,12 @@ Shifter Startup
 
 As mentioned earlier, the Shifter runtime requires the loop, squashfs, ext4 kernel modules loaded. If these modules are not loaded automatically by shifter, they can be loaded manually with:
 
-.. code-block:: bash
+```bash
 
    sudo modprobe ext4
    sudo modprobe loop
    sudo modprobe squashfs
-
+```
 
 
 Image Gateway
@@ -136,25 +135,25 @@ The Image Gateway depends on *MongoDB* server, *Redis*, *squashfs-tools*, virtua
 
 For RHEL/CentOS/Scientific Linux systems:
 
-.. code-block:: bash
+```bash
 
    yum install mongodb-server redis squashfs-tools
-
+````
 
 For Debian/Ubuntu systems:
 
-.. code-block:: bash
+```bash
 
    sudo apt-get install mongodb redis-server squashfs-tools
-
+```
 Install *virtualenv* through  *pip* for Python:
 
-.. code-block:: bash
+```bash
 
    wget https://bootstrap.pypa.io/get-pip.py
    sudo python get-pip.py
    sudo pip install virtualenv
-
+```
 
 Installation of the Image Gateway
 +++++++++++++++++++++++++++++++++
@@ -164,7 +163,7 @@ We need to create three directories:
 2. Where the Image Gateway will cache images
 3. Where the Image Gateway will expand images. **Note: For performance reasons this should be located in a local file system** (we experienced a **40x** slowdown of pulling and expanding images when the images were expanded on a Lustre parallel file system!).
 
-.. code-block:: bash
+```bash
 
    export IMAGEGW_PATH=/opt/shifter/imagegw
    export IMAGES_CACHE_PATH=/scratch/shifter/images/cache
@@ -172,14 +171,14 @@ We need to create three directories:
    mkdir -p $IMAGEGW_PATH
    mkdir -p $IMAGES_CACHE_PATH
    mkdir -p $IMAGES_EXPAND_PATH
-
+```
 Copy the contents of *shifter-master/imagegw* subdirectory to *$IMAGEGW_PATH*:
 
-.. code-block:: bash
+```bash
 
    cp -r imagegw/* $IMAGEGW_PATH
 
-
+```
 Next step is to prepare a python virtualenv in the Image Gateway installation directory. If this directory is owned by root, the virtualenv and the python requirements need to be also installed as root.
 
 
@@ -189,7 +188,7 @@ Next step is to prepare a python virtualenv in the Image Gateway installation di
 * Creating the virtualenv in a different folder (e.g. your `/home` directory), installing the packages and copying the virtualenv folder to the Image Gateway path will make the virtualenv refer to the directory where you created it, causing errors with the workers and configuration parameters.
 
 
-.. code-block:: bash
+```bash
 
    cd $IMAGEGW_PATH
    # Install the virtualenv and all python dependencies as root
@@ -203,26 +202,26 @@ Next step is to prepare a python virtualenv in the Image Gateway installation di
    deactivate
    # If you switched to root, return to your user
    exit
-
+```
 
 Clone and extract the rukkal/virtual-cluster repository from Github:
 
 
-.. code-block:: bash
+```bash
 
    wget https://github.com/rukkal/virtual-cluster/archive/master.zip
    mv master.zip virtual-cluster-master.zip
    unzip virtual-cluster-master.zip
-
+```
 
 Copy the following files from the virtual-cluster installation resources:
 
-.. code-block:: bash
+```bash
 
    cd virtual-cluster-master/shared-folder/installation
    sudo cp start-imagegw.sh ${IMAGEGW_PATH}/start-imagegw.sh
    sudo cp init.d.shifter-imagegw /etc/init.d/shifter-imagegw
-
+```
 
 Configure
 +++++++++
@@ -238,29 +237,30 @@ As a reference of configuration parameters consider the following entries as the
 
 Save the file to a local copy (e.g. *imagemanager.json.local*, just to have a backup ready for your system) and copy it to the configuration directory:
 
-.. code-block:: bash
+```bash
 
    sudo cp imagemanager.json.local $SHIFTER_SYSCONFDIR/imagemanager.json
-
+```
 Lastly, open *$IMAGEGW_PATH/start-imagegw.sh* and enter the name of your system in the line. This will spawn Celery worker threads with a more identifiable name.
 
-.. code-block:: bash
+```bash
 
    SYSTEMS="mycluster"
-
+```
 
 Image Gateway Startup
 +++++++++++++++++++++
 
 Start the services for Redis and MongoDB:
 
-.. code-block:: bash
+```bash
 
    sudo systemctl start redis
    sudo systemctl start mongod
-
+```
 Start the Shifter Image Gateway:
 
-.. code-block:: bash
+```bash
 
    sudo /etc/init.d/shifter-imagegw start
+```
