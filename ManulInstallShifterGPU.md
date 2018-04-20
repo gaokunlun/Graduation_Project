@@ -72,9 +72,12 @@ Configure and build the runtime:
                --with-json-c                    \
                --with-libcurl                   \
                --with-munge                     \
-               --with-slurm=/path/to/your/slurm/installation
-```               
-(if there is no 'LIBCURL = ' setting in file src/Makefile, set the 'LIBCURL = -L/usr/lib64/ -lcurl') !!!
+               --with-slurm=/usr/sbin [slurm安装目录] 
+```
+Attention: 
+源码中没有，添加进去
+(if there is no 'LIBCURL = ' setting in file src/Makefile, set the 'LIBCURL = -L/usr/lib64/ -lcurl') !!!!!!!!!!
+
 ```bash
    make -j8
    sudo make install
@@ -97,12 +100,12 @@ At run time, Shifter takes its configuration options from a file named *udiRoot.
 
 To illustrate the configuration process, consider the following parameters that were modified from the template configuration (*udiroot.conf.example*) to support the install on our local cluster named *Greina*:
 
-* **imagePath=/scratch/shifter/images** Absolute path to shifter's images. This path must be readable by root and available from all nodes in the cluster.
+* **imagePath=/nfs/shifter/images** Absolute path to shifter's images. This path must be readable by root and available from all nodes in the cluster.
 * **etcPath=/etc/shifter/shifter_etc_files** Absolute path to the files to be copied into /etc on the containers at startup.
 * **allowLocalChroot=1**
-* **autoLoadKernelModule=0** Flag to determine if kernel modules will be loaded by Shifter if required. This is limited to loop, squashfs, ext4 (and dependencies). *Recommend value 0* if kernel modules (loop, squashfs, and ext4) are already loaded as part of the node boot process, otherwise use *value 1* to let Shifter load the kernel modules.
-* **system=greina** The name of the computer cluster where shifter is deployed. It is **important for this to match the platform name in the json configuration file** for the Image Manager.
-* **imageGateway=http://greina9:5000** Space separated URLs for where the Image Gateway can be reached.
+* **autoLoadKernelModule=1** Flag to determine if kernel modules will be loaded by Shifter if required. This is limited to loop, squashfs, ext4 (and dependencies). *Recommend value 0* if kernel modules (loop, squashfs, and ext4) are already loaded as part of the node boot process, otherwise use *value 1* to let Shifter load the kernel modules.
+* **system=sunny** The name of the computer cluster where shifter is deployed. It is **important for this to match the platform name in the json configuration file** for the Image Manager.自定义
+* **imageGateway=http://172.17.17.100:5000** Space separated URLs for where the Image Gateway can be reached. 安装image gateway的节点地址
 * **siteResources=/opt/shifter/site-resources** Absolute path to where site-specific resources will be bind-mounted inside the container to enable features like native MPI or GPU support. This configuration only affects the container. The specified path will be automatically created inside the container. The specified path doesn't need to exist on the host.
 
 
@@ -166,11 +169,11 @@ We need to create three directories:
 ```bash
 
    export IMAGEGW_PATH=/opt/shifter/imagegw
-   export IMAGES_CACHE_PATH=/scratch/shifter/images/cache
+   export IMAGES_CACHE_PATH=/nfs/shifter/images/cache
    export IMAGES_EXPAND_PATH=/var/shifter/expand
-   mkdir -p $IMAGEGW_PATH
-   mkdir -p $IMAGES_CACHE_PATH
-   mkdir -p $IMAGES_EXPAND_PATH
+   mkdir -p $IMAGEGW_PATH 
+   mkdir -p $IMAGES_CACHE_PATH
+   mkdir -p $IMAGES_EXPAND_PATH
 ```
 Copy the contents of *shifter-master/imagegw* subdirectory to *$IMAGEGW_PATH*:
 
@@ -181,6 +184,11 @@ Copy the contents of *shifter-master/imagegw* subdirectory to *$IMAGEGW_PATH*:
 ```
 Next step is to prepare a python virtualenv in the Image Gateway installation directory. If this directory is owned by root, the virtualenv and the python requirements need to be also installed as root.
 
+进入目录：/opt/shifter/imagegw/shifter_imagegw，打开文件 "vim imageworker.py"，在程序开头加入：
+```python
+   from celery import Celery
+   app = Celery('imageworker', broker='redis://localhost:6379/0')
+```
 
 **Note**
 
@@ -199,7 +207,8 @@ Next step is to prepare a python virtualenv in the Image Gateway installation di
    # The requirement file should already be here if the imagegw folder has been copied
    # from the Shifter sources
    pip install -r requirements.txt
-   deactivate
+   pip install celery #自己添加，重要
+   deactivate
    # If you switched to root, return to your user
    exit
 ```
@@ -230,10 +239,10 @@ For configuration parameters, the Image Gateway uses a file named *imagemanager.
 
 As a reference of configuration parameters consider the following entries as they were used when installing in our local cluster (Greina):
 
-* **"CacheDirectory": "/scratch/shifter/images/cache/"**: Absolute path to the images cache. The same you chose when defining **$IMAGES_CACHE_PATH**
+* **"CacheDirectory": "/nfs/shifter/images/cache/"**: Absolute path to the images cache. The same you chose when defining **$IMAGES_CACHE_PATH**
 * **"ExpandDirectory": "/var/shifter/expand/"**: Absolute path to the images expand directory. The same you chose when defining **$IMAGES_EXPAND_PATH**.
-* Under **"Platforms"** entry change **"mycluster"** to the name of your system. This should be the same name you set for system in *udiRoot.conf*.
-* **"imageDir": "/scratch/shifter/images"**: This is the last among the fields defined for your platform. It is the absolute path to where shifter can find images. Should be the same as *imagePath* in *udiRoot.conf*.
+* Under **"Platforms"** entry change **"mycluster"** to the name of your system **"sunny"**. This should be the same name you set for system in *udiRoot.conf*.
+* **"imageDir": "/nfs/shifter/images"**: This is the last among the fields defined for your platform. It is the absolute path to where shifter can find images. Should be the same as *imagePath* in *udiRoot.conf*.
 
 Save the file to a local copy (e.g. *imagemanager.json.local*, just to have a backup ready for your system) and copy it to the configuration directory:
 
@@ -245,7 +254,7 @@ Lastly, open *$IMAGEGW_PATH/start-imagegw.sh* and enter the name of your system 
 
 ```bash
 
-   SYSTEMS="mycluster"
+   SYSTEMS="sunny"
 ```
 
 Image Gateway Startup
