@@ -256,6 +256,11 @@ Lastly, open *$IMAGEGW_PATH/start-imagegw.sh* and enter the name of your system 
 
    SYSTEMS="sunny"
 ```
+拷贝premount.sh和postmount.sh到/etc/shifter/目录下：
+```bash
+   cp /opt/shiter/imagegw/test/premount.sh /etc/shifter/
+   cp /opt/shiter/imagegw/test/postmount.sh /etc/shifter/
+```
 
 Image Gateway Startup
 +++++++++++++++++++++
